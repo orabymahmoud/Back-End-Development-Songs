@@ -100,7 +100,7 @@ def update_song(id):
     data = request.get_json()
 
     # check if the song was found
-    if db.songs.find_one({"id":id}) is None:
+    if db.songs.find_one({"id": id}) is not None:
         result = db.songs.update_one({"id":id}, {'$set': data})
         # do something with the song
         if result.matched_count > 0 and result.modified_count > 0 :
@@ -108,5 +108,16 @@ def update_song(id):
             return parse_json(song), 200
         else:
             return {"message":"song found, but nothing updated"}
+    else:
+       return {"message": "song not found"}, 404 
+
+@app.route("/song/<int:id>" , methods = ["DELETE"])
+def delete_song(id):
+    
+    # check if the song was found
+    if db.songs.find_one({"id": id}) is not None:
+        result = db.songs.delete_one({"id":id})
+
+        return {"message":"song deleted"} ,200
     else:
        return {"message": "song not found"}, 404 
